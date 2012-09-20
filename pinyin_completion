@@ -52,7 +52,7 @@ _py_completion()
         sep="/"
     fi
 
-    cd "$dname_real"
+    cd $dname_real
 
     if [ "$1" = "-d" ];then
         rt=(${rt[@]-} $(
