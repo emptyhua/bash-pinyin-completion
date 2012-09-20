@@ -10,6 +10,27 @@ _py_save_function() {
     eval "$NEWNAME_FUNC"
 }
 
+#"'><=;|&(:\[]
+_py_encode_name() {
+    local tmp="$1"
+    tmp=${tmp//\\/\\\\}
+    tmp=${tmp//\ /\\ }
+    tmp=${tmp//\"/\\\"}
+    tmp=${tmp//\'/\\\'}
+    tmp=${tmp//\>/\\>}
+    tmp=${tmp//\</\\<}
+    tmp=${tmp//\=/\\=}
+    tmp=${tmp//\;/\\;}
+    tmp=${tmp//\|/\\|}
+    tmp=${tmp//\&/\\&}
+    tmp=${tmp//\(/\\(}
+    tmp=${tmp//\:/\\:}
+    tmp=${tmp//\[/\\[}
+    tmp=${tmp//\{/\\\{}
+    tmp=${tmp//\}/\\\}}
+    printf -v $2 %s "$tmp"
+}
+
 #中文补齐函数
 
 _py_completion()
@@ -18,47 +39,60 @@ _py_completion()
     local cur
 
 #兼容旧版本的bash-completion
-    test -z "`typeset -f _get_comp_words_by_ref`" && 
-        cur=`_get_cword` ||
+    test -z "$(typeset -f _get_comp_words_by_ref)" && 
+    cur="$(_get_cword)" ||
         _get_comp_words_by_ref cur
 
     _expand || return 0
 
-    local dname bname tmp sep
+    local dname_real bname_real dname bname tmp tmp2 sep
     local -a rt
 #目录名部分
-    dname=$(dirname "$cur");
+    dname="$(dirname "$cur")";
 #文件名部分
-    bname=$(basename "$cur");
+    bname="$(basename "$cur")";
 
-#eval 用于消除转义符 例如 \[ 将变成 [ 
-    eval dname=${dname}
-    eval bname=${bname}
+#cd "./
+    if [[ "${dname:0:1}" == "\"" ]]; then
+        dname="${dname:1}"
+    fi
 
-    test -z "$bname" && return 0;
+    if [[ "${bname:0:1}" == "\"" ]]; then
+        bname="${bname:1}"
+    fi
 
-    if [ "${dname}" = "/" ];then
+    #eval 用于消除转义符 例如 \[ 将变成 [ 
+    eval dname_real="$dname"
+    eval bname_real="$bname"
+
+    test -z "$bname_real" && return 0;
+
+    if [ "$dname" = "/" ];then
         sep=""
     else
         sep="/"
     fi
 
-    cd "$dname"
+    cd "$dname_real"
 
     if [ "$1" = "-d" ];then
         rt=(${rt[@]-} $(
-        find . -maxdepth 1 -type d -print|cut -b 3-|pinyinmatch -f -c "$bname"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
-            printf '%s%s%s\n' "$dname" "$sep" "$tmp"
+        find . -maxdepth 1 -type d -print|cut -b 3-|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
+        printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
     else
         rt=(${rt[@]-} $(
-        find . -maxdepth 1 -print|cut -b 3-|pinyinmatch -f -c "$bname"|grep -v "^0"|cut -c 3-|while read -r tmp;do
-            printf '%s%s%s\n' "$dname" "$sep" "$tmp"
+        find . -maxdepth 1 -print|cut -b 3-|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
+        #很奇怪为神马补齐文件的话，不会给自动编码一下特殊字符，这里自己做一下
+        _py_encode_name "$tmp" tmp2
+        printf '%s%s%s\n' "$dname_real" "$sep" "$tmp2"
         done
         ))
     fi
-    
+
+    cd $OLDPWD 
+
     COMPREPLY=( "${COMPREPLY[@]}" "${rt[@]}" )
 }
 
