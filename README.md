@@ -24,7 +24,7 @@
     . /opt/local/etc/bash_completion
     fi
 
-下载源码,并编译
+下载源码,并编译,编译之前根据自己的xcode安装目录修改Makefile中的XCODE_SDK变量
 
     git clone git://github.com/emptyhua/bash-pinyin-completion.git
     cd bash-pinyin*
