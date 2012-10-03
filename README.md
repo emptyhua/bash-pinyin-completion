@@ -13,6 +13,15 @@
 
 然后新开一个终端，就可以使用拼音补齐了
 
+### Other Linux
+
+    git clone git://github.com/emptyhua/bash-pinyin-completion.git
+    cd bash-pinyin*
+    make
+    sudo make install
+    
+然后新开一个终端，就可以使用拼音补齐了
+
 ### Mac OS X
 对于mac需要先安装 bash-completion
 
@@ -24,7 +33,7 @@
     . /opt/local/etc/bash_completion
     fi
 
-下载源码,并编译
+下载源码,并编译,编译之前根据自己的xcode安装目录修改Makefile中的XCODE_SDK变量
 
     git clone git://github.com/emptyhua/bash-pinyin-completion.git
     cd bash-pinyin*
