@@ -10,6 +10,23 @@ _py_save_function() {
     eval "$NEWNAME_FUNC"
 }
 
+#兼容旧版本的bash-completion
+if test -z "$(typeset -f _compopt_o_filenames)";then
+
+# This function turns on "-o filenames" behavior dynamically. It is present
+# for bash < 4 reasons. See http://bugs.debian.org/272660#64 for info about
+# the bash < 4 compgen hack.
+_compopt_o_filenames()
+{
+    # We test for compopt availability first because directly invoking it on
+    # bash < 4 at this point may cause terminal echo to be turned off for some
+    # reason, see https://bugzilla.redhat.com/653669 for more info.
+    type compopt &>/dev/null && compopt -o filenames 2>/dev/null || \
+        compgen -f /non-existing-dir/ >/dev/null
+}
+
+fi
+
 #中文补齐函数
 
 _py_completion()
@@ -46,7 +63,7 @@ _py_completion()
 
     test -z "$bname_real" && return 0;
 
-    if [ "$dname" = "/" ];then
+    if [[ "$dname" == "/" ]];then
         sep=""
     else
         sep="/"
@@ -54,7 +71,7 @@ _py_completion()
 
     cd $dname_real
 
-    if [ "$1" = "-d" ];then
+    if [[ "$1" == "-d" ]];then
         rt=(${rt[@]-} $(
         find . -maxdepth 1 -type d -print|cut -b 3-|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
