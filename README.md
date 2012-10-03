@@ -14,6 +14,7 @@
 然后新开一个终端，就可以使用拼音补齐了
 
 ### Other Linux
+对于其他发行版本，只要安装了bash－completion都可以使用源码安装(已测的bash－completion最低版本为1.1)
 
     git clone git://github.com/emptyhua/bash-pinyin-completion.git
     cd bash-pinyin*
