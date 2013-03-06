@@ -69,6 +69,7 @@ _py_completion()
         sep="/"
     fi
 
+    test ! -d "$dname_real" && return 0;
     cd $dname_real
 
     if [[ "$1" == "-d" ]];then
