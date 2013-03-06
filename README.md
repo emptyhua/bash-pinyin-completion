@@ -2,10 +2,11 @@
 
   * 支持拼音首字母匹配和完全匹配
   * 支持多音字匹配
+  * 仅支持UTF-8编码环境
 
 ## 安装
 ### ubuntu
-支持10.04,10.10,11.04,11.10,12.04版本从ppa安装
+支持10.04 ~ 12.10版本从ppa安装
 
     sudo add-apt-repository ppa:emptyhua/toolbox
     sudo apt-get update
