@@ -74,13 +74,13 @@ _py_completion()
 
     if [[ "$1" == "-d" ]];then
         rt=(${rt[@]-} $(
-        find . -maxdepth 1 -type d -print|cut -b 3-|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
+        compgen -d|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
     else
         rt=(${rt[@]-} $(
-        find . -maxdepth 1 -print|cut -b 3-|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
+        compgen -f|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
