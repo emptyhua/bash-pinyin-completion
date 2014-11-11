@@ -13,7 +13,6 @@
 #include <string.h>
 #include "pinyin.h"
 #include "utf8vector.h"
-//#include "linereader.h"
 
 #ifdef DEBUG
 #define MYLOG(x,ARGS...) fprintf (stderr, "[%s: %s (): line %d] "x"\n", __FILE__, __FUNCTION__, __LINE__, ##ARGS)
@@ -217,35 +216,30 @@ int main(int argc, char **argv)
         return 0;
     char *line = argv[argc-1];
 
-    //linereader reader = linereader_create(STDIN_FILENO);
     int count = strlen(line);;
-    //while ((count = linereader_readline(reader)) != -1)
+    int match_count = -1;
+    if (!match_firstletter_only)
     {
-        //const char *line = reader->line_buffer;
-        int match_count = -1;
-        if (!match_firstletter_only)
-        {
-            match_count = match_line_with_keyword(line, count, keyword, MatchModeFull);
+        match_count = match_line_with_keyword(line, count, keyword, MatchModeFull);
 
-            if (match_count == -1 && match_firstletter)
-            {
-                match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
-            }
-
-        }
-        else
+        if (match_count == -1 && match_firstletter)
         {
             match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
         }
 
-        if (match_count != -1)
-        {
-            if (show_match_count)
-                printf("%d\t%.*s\n", match_count, count, line);
-            else
-                printf("%.*s\n", count, line);
-        }
     }
-    //linereader_free(reader);
+    else
+    {
+        match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
+    }
+
+    if (match_count != -1)
+    {
+        if (show_match_count)
+            printf("%d\t%.*s\n", match_count, count, line);
+        else
+            printf("%.*s\n", count, line);
+    }
+
     return 0;
 }
