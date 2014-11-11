@@ -10,9 +10,10 @@
 #include <stddef.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
 #include "pinyin.h"
 #include "utf8vector.h"
-#include "linereader.h"
+//#include "linereader.h"
 
 #ifdef DEBUG
 #define MYLOG(x,ARGS...) fprintf (stderr, "[%s: %s (): line %d] "x"\n", __FILE__, __FUNCTION__, __LINE__, ##ARGS)
@@ -210,14 +211,17 @@ int main(int argc, char **argv)
         fprintf(stderr, "keyword missing\n");
         return 1;
     }
-    
     char *keyword = argv[optind];
 
-    linereader reader = linereader_create(STDIN_FILENO);
-    int count;
-    while ((count = linereader_readline(reader)) != -1)
+    if (optind == argc-1)
+        return 0;
+    char *line = argv[argc-1];
+
+    //linereader reader = linereader_create(STDIN_FILENO);
+    int count = strlen(line);;
+    //while ((count = linereader_readline(reader)) != -1)
     {
-        const char *line = reader->line_buffer;
+        //const char *line = reader->line_buffer;
         int match_count = -1;
         if (!match_firstletter_only)
         {
@@ -242,6 +246,6 @@ int main(int argc, char **argv)
                 printf("%.*s\n", count, line);
         }
     }
-    linereader_free(reader);
+    //linereader_free(reader);
     return 0;
 }

@@ -1,6 +1,6 @@
 LINUX_BASHCD=$(DESTDIR)/etc/bash_completion.d
 LINUX_BIN=$(DESTDIR)/usr/bin
-XCODE_SDK=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
+XCODE_SDK=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk
 PLATFORM=$(shell uname)
 
 ifeq ($(PLATFORM),Darwin)
@@ -12,8 +12,8 @@ all:pinyinmatch
 
 build:pinyinmatch
 
-pinyinmatch:pinyinmatch.o pinyin.o utf8vector.o linereader.o
-	gcc -Wall $(CFLAGS) -std=c99 pinyinmatch.o pinyin.o utf8vector.o linereader.o -o pinyinmatch
+pinyinmatch:pinyinmatch.o pinyin.o utf8vector.o 
+	gcc -Wall $(CFLAGS) -std=c99 pinyinmatch.o pinyin.o utf8vector.o -o pinyinmatch
 
 %.o:%.c
 	gcc -Wall $(CFLAGS) -std=c99 -c $< -o ./$@
