@@ -83,7 +83,6 @@ wchar_t utf8vector_next_unichar_with_raw(utf8vector vector, const char **raw, in
         vector->index += 2;
         uni = ((utf[0] & 0x1F) << 6)
             | (utf[1] & 0x3F);
-        vector->index += 2;
         if (raw)
         {
             *raw = utf;
