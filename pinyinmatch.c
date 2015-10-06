@@ -10,9 +10,9 @@
 #include <stddef.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
 #include "pinyin.h"
 #include "utf8vector.h"
-#include "linereader.h"
 
 #ifdef DEBUG
 #define MYLOG(x,ARGS...) fprintf (stderr, "[%s: %s (): line %d] "x"\n", __FILE__, __FUNCTION__, __LINE__, ##ARGS)
@@ -210,38 +210,36 @@ int main(int argc, char **argv)
         fprintf(stderr, "keyword missing\n");
         return 1;
     }
-    
     char *keyword = argv[optind];
 
-    linereader reader = linereader_create(STDIN_FILENO);
-    int count;
-    while ((count = linereader_readline(reader)) != -1)
+    if (optind == argc-1)
+        return 0;
+    char *line = argv[argc-1];
+
+    int count = strlen(line);;
+    int match_count = -1;
+    if (!match_firstletter_only)
     {
-        const char *line = reader->line_buffer;
-        int match_count = -1;
-        if (!match_firstletter_only)
-        {
-            match_count = match_line_with_keyword(line, count, keyword, MatchModeFull);
+        match_count = match_line_with_keyword(line, count, keyword, MatchModeFull);
 
-            if (match_count == -1 && match_firstletter)
-            {
-                match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
-            }
-
-        }
-        else
+        if (match_count == -1 && match_firstletter)
         {
             match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
         }
 
-        if (match_count != -1)
-        {
-            if (show_match_count)
-                printf("%d\t%.*s\n", match_count, count, line);
-            else
-                printf("%.*s\n", count, line);
-        }
     }
-    linereader_free(reader);
+    else
+    {
+        match_count = match_line_with_keyword(line, count, keyword, MatchModeFirstLetter);
+    }
+
+    if (match_count != -1)
+    {
+        if (show_match_count)
+            printf("%d\t%.*s\n", match_count, count, line);
+        else
+            printf("%.*s\n", count, line);
+    }
+
     return 0;
 }
