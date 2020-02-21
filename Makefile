@@ -21,9 +21,9 @@ pinyinmatch:pinyinmatch.o pinyin.o utf8vector.o linereader.o
 install:	
 	if [ "`uname`" = "Darwin" ];then \
 		echo macos; \
-		test ! -e "/opt/local/etc/bash_completion.d" && echo 需要安装bash-completion && exit 1; \
+		test ! -e "/usr/local/etc/bash_completion.d" && echo 'install bash-completion first!' && exit 1; \
 		cp pinyinmatch /usr/local/bin ;\
-		cp pinyin_completion /opt/local/etc/bash_completion.d/ ;\
+		cp pinyin_completion //usr/local/etc/bash_completion.d/ ;\
 	elif [ "`uname`" = "Linux" ];then \
 		echo linux; \
 		install -d $(LINUX_BASHCD) ;\
