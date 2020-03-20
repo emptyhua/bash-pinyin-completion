@@ -44,9 +44,9 @@ _py_completion()
     local dname_real bname_real dname bname tmp tmp2 sep
     local -a rt
 #目录名部分
-    dname="$(dirname "$cur")";
+    dname="$(dirname -- "$cur")";
 #文件名部分
-    bname="$(basename "$cur")";
+    bname="$(basename -- "$cur")";
 
 #cd "./
     if [[ "${dname:0:1}" == "\"" ]]; then
@@ -70,17 +70,17 @@ _py_completion()
     fi
 
     test ! -d "$dname_real" && return 0;
-    cd $dname_real
+    cd -- "$dname_real"
 
     if [[ "$1" == "-d" ]];then
         rt=(${rt[@]-} $(
-        compgen -d|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
+        compgen -d|pinyinmatch -f -c -- "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
     else
         rt=(${rt[@]-} $(
-        compgen -f|pinyinmatch -f -c "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
+        compgen -f|pinyinmatch -f -c -- "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
