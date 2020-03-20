@@ -43,23 +43,34 @@ _py_completion()
 
     local dname_real bname_real dname bname tmp tmp2 sep
     local -a rt
-#目录名部分
-    dname="$(dirname -- "$cur")";
-#文件名部分
-    bname="$(basename -- "$cur")";
 
-#cd "./
-    if [[ "${dname:0:1}" == "\"" ]]; then
-        dname="${dname:1}"
+    if [[ "${cur:0:1}" == "'" ]]
+    then
+        #目录名部分
+        dname="$(dirname -- "${cur:1}")";
+        #文件名部分
+        bname="$(basename -- "${cur:1}")";
+
+        dname_real="$dname"
+        bname_real="$bname"
+    else
+        #目录名部分
+        dname="$(dirname -- "$cur")";
+        #文件名部分
+        bname="$(basename -- "$cur")";
+
+        if [[ "${dname:0:1}" == "\"" ]]; then
+            dname="${dname:1}"
+        fi
+
+        if [[ "${bname:0:1}" == "\"" ]]; then
+            bname="${bname:1}"
+        fi
+
+        #eval 用于消除转义符 例如 \[ 将变成 [ 
+        eval dname_real="$dname"
+        eval bname_real="$bname"
     fi
-
-    if [[ "${bname:0:1}" == "\"" ]]; then
-        bname="${bname:1}"
-    fi
-
-    #eval 用于消除转义符 例如 \[ 将变成 [ 
-    eval dname_real="$dname"
-    eval bname_real="$bname"
 
     test -z "$bname_real" && return 0;
 
