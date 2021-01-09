@@ -16,7 +16,7 @@ pinyinmatch:pinyinmatch.o pinyin.o utf8vector.o linereader.o
 	gcc -Wall $(CFLAGS) -std=c99 pinyinmatch.o pinyin.o utf8vector.o linereader.o -o pinyinmatch
 
 %.o:%.c
-	gcc -Wall $(CFLAGS) -std=c99 -c $< -o ./$@
+	gcc -Wall $(CFLAGS) -O2 -std=c99 -c $< -o ./$@
 
 install:	
 	case "${PLATFORM}" in \

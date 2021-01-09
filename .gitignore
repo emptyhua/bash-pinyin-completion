@@ -11,3 +11,4 @@
 *.la
 *.a
 pinyinmatch
+*.exe
