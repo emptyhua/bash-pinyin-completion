@@ -5,9 +5,15 @@
 #用于保存覆盖之前的函数
 #from http://mivok.net/2009/09/20/bashfunctionoverride.html
 _py_save_function() {
-    local ORIG_FUNC=$(declare -f $1)
-    local NEWNAME_FUNC="$2${ORIG_FUNC#$1}"
-    eval "$NEWNAME_FUNC"
+    command -v "$1" >/dev/null || return 1; # original function does not exist
+
+    local ORIG_FUNC NEW_FUNC;
+	ORIG_FUNC="$(declare -f "$1")";
+	ORIG_FUNC="${ORIG_FUNC#"$1"}"; # remove the name from the function definition
+	test -n "$ORIG_FUNC" || return 1; # original function does not exist
+
+	NEW_FUNC="${2}${ORIG_FUNC}";
+    eval "$NEW_FUNC";
 }
 
 #兼容旧版本的bash-completion
@@ -31,11 +37,11 @@ fi
 
 _py_completion()
 {
-    local IFS=$'\t\n' 
+    local IFS=$'\t\n'
     local cur
 
 #兼容旧版本的bash-completion
-    test -z "$(typeset -f _get_comp_words_by_ref)" && 
+    test -z "$(typeset -f _get_comp_words_by_ref)" &&
     cur="$(_get_cword)" ||
         _get_comp_words_by_ref cur
 
@@ -67,7 +73,7 @@ _py_completion()
             bname="${bname:1}"
         fi
 
-        #eval 用于消除转义符 例如 \[ 将变成 [ 
+        #eval 用于消除转义符 例如 \[ 将变成 [
         eval dname_real="$dname"
         eval bname_real="$bname"
     fi
@@ -81,11 +87,11 @@ _py_completion()
     fi
 
     test ! -d "$dname_real" && return 0;
-    cd -- "$dname_real"
+    cd -- "$dname_real" || return 1;
 
     if [[ "$1" == "-d" ]];then
         rt=(${rt[@]-} $(
-        compgen -d|pinyinmatch -f -c -- "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do 
+        compgen -d|pinyinmatch -f -c -- "$bname_real"|grep -v "^0"|cut -c 3-|while read -r tmp;do
         printf '%s%s%s\n' "$dname_real" "$sep" "$tmp"
         done
         ))
@@ -98,26 +104,37 @@ _py_completion()
         [ ${#rt[@]} -ne 0 ] && _compopt_o_filenames
     fi
 
-    cd $OLDPWD 
+    cd "$OLDPWD" || return 1;
 
     COMPREPLY=( "${COMPREPLY[@]}" "${rt[@]}" )
 }
 
-_py_save_function _filedir _py_bak_filedir
+if _py_save_function _comp_compgen_filedir _py_bak_filedir; then
+    # _comp_compgen_filedir is a new function since bash-completion 2.12
+    # https://github.com/scop/bash-completion/commit/6e8a1546bde205fd7064d9e578f35ec67e2c6840
+    _comp_compgen_filedir()
+    {
+        _py_bak_filedir "${@}"
+        _py_completion "${@}"
+    }
 
-_filedir()
-{
-    _py_bak_filedir $@
-    _py_completion $@ 
-}
+elif _py_save_function _filedir _py_bak_filedir; then
+    # _filedir is a deprecated function in bash-completion
+    # But we keep this function in here for compatibility with the old version of bash-completion
+    _filedir()
+    {
+        _py_bak_filedir "${@}"
+        _py_completion "${@}"
+    }
+fi
 
-_py_save_function _filedir_xspec _py_bak_filedir_xspec
-
-_filedir_xspec ()
-{
-    _py_bak_filedir_xspec $@
-    _py_completion $@ 
-}
+if _py_save_function _filedir_xspec _py_bak_filedir_xspec; then
+    _filedir_xspec ()
+    {
+        _py_bak_filedir_xspec "${@}"
+        _py_completion "${@}"
+    }
+fi
 
 unset -f _py_save_function
 
